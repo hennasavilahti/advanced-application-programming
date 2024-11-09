@@ -1,7 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { View, Text, Image, StyleSheet, ActivityIndicator } from 'react-native';
 import { WeatherContext } from '../context/WeatherContext';
-import weatherIcon from '../assets/weatherIcon.png';
 
 const WeatherInfo = () => {
   const { weatherData, loading } = useContext(WeatherContext);
