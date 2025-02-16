@@ -39,7 +39,8 @@ const App = () => {
   const fetchCatPicture = async () => {
     setLoading(true);
     try {
-      const apiKey = '{YOUR_API_KEY}';
+      const apiKey =
+        'live_9z5sZ9M4toxRhQXe7m63K2nlKg1G6y6CRHpVHRwx1X11i66WpTymkY5aeDBCZMR0';
 
       const response = await fetch(
         `https://api.thecatapi.com/v1/images/search?has_breeds=1&api_key=${apiKey}`
