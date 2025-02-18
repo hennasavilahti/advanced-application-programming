@@ -1,0 +1,13 @@
+
+<RCC>
+<qresource>
+<file>qtquickcontrols2.conf</file>
+<file>WeatherDisplay.qmlproject</file>
+<file>WeatherDisplay/Constants.qml</file>
+<file>WeatherDisplay/EventListModel.qml</file>
+<file>WeatherDisplay/EventListSimulator.qml</file>
+<file>WeatherDisplay/qmldir</file>
+<file>WeatherDisplayContent/App.qml</file>
+<file>WeatherDisplayContent/images/1779940.png</file>
+</qresource>
+</RCC>
