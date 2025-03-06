@@ -13,24 +13,27 @@ Window {
     title: "WeatherDisplay"
 
     property color gradientStopColor: "blue"
-    property string weatherLocationString: "Tampere"
     property color currentColor: "black"
-    property string currentWeather: "clouds"
-    property real currentTemperature: 20
+
+    property string city: "Haetaan säätietoja..."
+    property string weather: "..."
+    property string icon: ""
+    property double temperature: 0
+    property double windspeed: 0
+    property string apiKey: "YOUR_API_KEY_HERE"
 
     // Funktio, joka vaihtaa taustan väriä lämpötilan mukaan
     function updateBackground() {
-        if (currentTemperature < 0) {
+        if (temperature < 0) {
             gradientStopColor = "deepskyblue"
-        } else if (currentTemperature >= 20) {
+        } else if (temperature >= 20) {
             gradientStopColor = "indianred"
-        } else  if (currentTemperature > 10){
+        } else  if (temperature > 10){
             gradientStopColor = "darksalmon"
         } else {
             gradientStopColor = "khaki"
         }
     }
-
 
     // Tausta, joka täyttää ikkunan ja sen taustaväri on gradient
     Rectangle {
@@ -52,7 +55,7 @@ Window {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: parent.top
             anchors.topMargin: 50
-            text: weatherLocationString
+            text: city
             color: currentColor
             font.pixelSize: 50
             font.family: "Arial"
@@ -76,7 +79,7 @@ Window {
                 id: image
                 width: 200
                 height: 200
-                source: "images/" + currentWeather + ".png"
+                source: "https://openweathermap.org/img/wn/"+ icon + "@4x.png"
             }
 
 
@@ -87,44 +90,62 @@ Window {
 
                 Text {
                     id: weatherText
-                    text: currentWeather
-                    font.pixelSize: 40
+                    text: weather
+                    font.pixelSize: 35
                     font.family: "Arial"
                 }
 
                 Text {
                     id: temperatureText
-                    text: currentTemperature + " C"
-                    font.pixelSize: 40
+                    text: temperature + " °C"
+                    font.pixelSize: 35
                     font.family: "Arial"
                 }
 
                 Text {
                     id: windSpeedText
-                    text: "3 m/s"
-                    font.pixelSize: 40
+                    text: windspeed + " m/s"
+                    font.pixelSize: 35
                     font.family: "Arial"
                 }
             }
         }
+    }
 
-        Button {
-            id: updateButton
-            anchors.bottom: parent.bottom
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.bottomMargin: 100
-            text: "Update Temperature"
-            onClicked: {
-                // Satunnaisesti generoitu lämpötila
-                currentTemperature = Math.floor(Math.random()* 30) - 5
-                updateBackground()
-            }
-        }
+    // Kutsutaan funktiota, kun komponentti on näytöllä (lifecycle event)
+    Component.onCompleted: {
+        fetchWeatherData()
+        updateBackground()
 
     }
 
-    Component.onCompleted: {
-        updateBackground()
+    // Javascript -funktio, joka hakee säätiedot OpenWeatherMap -palvelimelta
+    function fetchWeatherData() {
+        const url = "https://api.openweathermap.org/data/2.5/weather?q=tampere&units=metric&appid=" + apiKey
+        const httpRequest = new XMLHttpRequest();
+        httpRequest.open("GET", url); // Luodaan pyyntö get requestille
+
+        // Toteutetaan callbackit valmistuneelle resurssille
+        httpRequest.onreadystatechange = function() {
+            // Tässä käsitellään itse JSON -data
+            if( httpRequest.readyState === XMLHttpRequest.DONE ) { // Request on valmis
+                if ( httpRequest.status === 200) { // Request ok, pitäisi olla data
+                    // Päivitetään city, temperature ja windspeed
+                    const response = JSON.parse( httpRequest.responseText ); // Response on nyt meidän JSON -objekti
+                    city = response.name;
+                    weather = response.weather[0].description
+                    icon = response.weather[0].icon
+                    temperature = response.main.temp;
+                    windspeed = response.wind.speed;
+                    updateBackground();
+                }
+                else {
+                    // Error fetching data (ilmoita käyttöliittymälle) httpRequest.status kertoo virheen
+                    city = "Virhe latauksessa..."
+                }
+            }
+        }
+        httpRequest.send(); // Lähetetään pyyntö
     }
 }
 
